@@ -8,7 +8,6 @@ from utils import fully_minimize_json
 from google_to_openai import Converter 
 
 def main():
-  load_dotenv(dotenv_path='.env.secrets')
   load_dotenv(dotenv_path='.env.nonsecrets', override=True)
 
   parser = argparse.ArgumentParser(description='Fetch samples from BigQuery or JSON file.')
