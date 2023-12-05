@@ -1,6 +1,7 @@
 import argparse
 from dotenv import load_dotenv
 import os
+import json
 from google_bigquery_patents_dataset import BigQueryTableReader
 from sample import Sample
 from pprint import pprint
@@ -20,7 +21,7 @@ def main():
   if args.samples and args.file:
     raise Exception("Please pass --samples or --file but not both")
   elif args.samples:
-    raise Exception("Please use a preapred sample via the --file flag; they are really expensive to collect")
+    raise Exception("Use a preapred sample via the --file flag; samples are really expensive to collect")
     # validate_n(args.samples)
     # reader = BigQueryTableReader(os.getenv('GOOGLE_CLOUD_PROJECT'), os.getenv('GOOGLE_PATENTS_CLOUD_PROJECT'), os.getenv('COOGLE_CLOUD_DATASET'))
     # rows = reader.get_random_rows(os.getenv('TABLE_ID'), args.samples, "ARRAY_LENGTH(description_localized) > 0")
@@ -40,7 +41,10 @@ def main():
     fully_minimize_json,
     )
   prepared_subsample = conv.prepare_for_embedding()
-  pprint(prepared_subsample)
+  print(f"Prepared {len(prepared_subsample)} subsamples from {os.getenv('SUB_SAMPLE_SIZE')} requested")
+  file_path = f"subsamples/len_{len(prepared_subsample)}_sample_{os.getenv('RUN_ID')}.json"
+  with open(file_path, 'w') as file:
+    json.dump(prepared_subsample, file)
 
 if __name__ == '__main__':
     main()

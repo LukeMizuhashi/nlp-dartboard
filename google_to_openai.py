@@ -14,7 +14,8 @@ class Converter:
     self._minimization_strategy = minimization_strategy
     self._enc = tiktoken.encoding_for_model(self._embedding_model)
     self._base_keys = base_keys
-    self._non_base_keys = [key for key in self._sample._patents[0]._row.keys() if key not in self._base_keys]
+    # self._non_base_keys = [key for key in self._sample._patents[0]._row.keys() if key not in self._base_keys]
+    self._non_base_keys = ['description_localized']
     self._token_slack = token_slack
     self._subsample_memo = None
     self._token_counts_memo = None
@@ -51,7 +52,7 @@ class Converter:
     minimized_patent = self._subsample[i]
     return get_subset(minimized_patent, [key for key in self._non_base_keys if self._token_counts[key][i] > 0])
 
-  def prepare_for_embedding(self) -> List[dict]:
+  def prepare_for_embedding(self) -> List[str]:
     prepared_patents = []
     for i in range(len(self._subsample)):
       base_patent = self._get_base_patent(i) 
@@ -62,21 +63,12 @@ class Converter:
       for key in self._non_base_keys:
         non_base_patent = self._get_non_base_patent(i)
         if key in non_base_patent:
-          width = self._binary_search(i, key)
-          left, right = 0, width 
-          non_base_patent = self._get_non_base_patent(i)
-          minimized_value = self._minimization_strategy(json.dumps(non_base_patent[key]))
-          while left <= len(minimized_value):
-            base_patent = self._get_base_patent(i)
-            base_patent[key] = minimized_value[left:right]
-            prepared_patent = self._minimization_strategy(json.dumps(base_patent))
-            encoded_prepared_patent = len(self._enc.encode(prepared_patent))
-            if encoded_prepared_patent > self._max_token:
-              print(f"{self._sample._patents[i].unique_id} skipped: too many tokens even after preparation")
-              continue
-            prepared_patents.append(prepared_patent)
-            left = right
-            right += width
+          merged_patent = {**base_patent, **non_base_patent}
+          if self._get_token_count(merged_patent) <= self._max_token:
+            prepared_patents.append(self._minimization_strategy(json.dumps(merged_patent)))
+          else:
+            print(f"{self._sample._patents[i].unique_id} skipped: too many tokens after merge")
+            continue
     return prepared_patents
 
   def _dict_to_tokens(self, dictionary: dict) -> List[int]:
