@@ -3,7 +3,6 @@ from sample import Sample, Patent
 import json
 from utils import pick_unique_random_numbers, fully_minimize_json, get_subset
 from collections import defaultdict
-from pprint import pprint
 from typing import List
 
 class Converter:
@@ -44,19 +43,6 @@ class Converter:
           self._token_counts_memo[key].append(len(self._enc.encode(value)))
     return self._token_counts_memo
 
-  @property
-  def _stats(self) -> defaultdict(list):
-    if not self._stats_memo:
-      self._stats_memo = defaultdict(float)
-      for minimized_patent in self._subsample:
-        for key in minimized_patent.keys():
-          non_zero_token_counts = [i for i in self._token_counts[key] if i > 0]
-          if len(non_zero_token_counts) > 0:
-            self._stats_memo[key] = sum(self._token_counts[key]) / len(non_zero_token_counts)
-          else:
-            self._stats_memo[key] = 0
-    return self._stats_memo
-
   def _get_base_patent(self, i: int) -> dict:
     minimized_patent = self._subsample[i]
     return get_subset(minimized_patent, [key for key in self._base_keys if self._token_counts[key][i] > 0])
@@ -71,7 +57,7 @@ class Converter:
       base_patent = self._get_base_patent(i) 
       available_tokens = self._max_token - self._get_token_count(base_patent)
       if available_tokens <= 0:
-        print(f"{self._sample._patents[i].unique_id} not embedded: too many tokens consumed by base patent")
+        print(f"{self._sample._patents[i].unique_id} skipped: too many tokens consumed by base patent")
         continue
       for key in self._non_base_keys:
         non_base_patent = self._get_non_base_patent(i)
@@ -86,14 +72,8 @@ class Converter:
             prepared_patent = self._minimization_strategy(json.dumps(base_patent))
             encoded_prepared_patent = len(self._enc.encode(prepared_patent))
             if encoded_prepared_patent > self._max_token:
-              pprint({
-                'encoded_length': encoded_prepared_patent,
-                'overshoot': encoded_prepared_patent - self._max_token,
-                'width': width,
-                'left': left,
-                'right': right,
-                'string_len': len(minimized_value),
-              })
+              print(f"{self._sample._patents[i].unique_id} skipped: too many tokens even after preparation")
+              continue
             prepared_patents.append(prepared_patent)
             left = right
             right += width
