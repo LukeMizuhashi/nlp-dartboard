@@ -32,12 +32,13 @@ def main():
     conv = Converter(
         sample,
         os.getenv('OPEN_AI_EMBEDDING_MODEL'),
-        os.getenv('OPEN_AI_EMBEDDING_MAX_TOKENS'),
+        int(os.getenv('OPEN_AI_EMBEDDING_MAX_TOKENS')),
         int(os.getenv('SUB_SAMPLE_SIZE')),
         os.getenv('BASE_KEYS').split(','),
+        int(os.getenv('OPEN_AI_TOKEN_SLACK')),
         fully_minimize_json,
         )
-    conv.get_embeddings()
+    conv.prepare_for_embedding()
     # pprint(conv._stats)
 
 if __name__ == '__main__':
