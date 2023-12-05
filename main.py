@@ -4,9 +4,9 @@ import os
 from google_bigquery_patents_dataset import BigQueryTableReader
 from sample import Sample
 from pprint import pprint
-from utils import validate_n
+from utils import validate_n, fully_minimize_json
 from open_ai_client import OpenAiClient
-import json
+from google_to_openai import Converter 
 
 def main():
     load_dotenv(dotenv_path='.env.secrets')
@@ -23,13 +23,22 @@ def main():
         validate_n(args.samples)
         reader = BigQueryTableReader(os.getenv('GOOGLE_CLOUD_PROJECT'), os.getenv('GOOGLE_PATENTS_CLOUD_PROJECT'), os.getenv('COOGLE_CLOUD_DATASET'))
         rows = reader.get_random_rows(os.getenv('TABLE_ID'), args.samples, "ARRAY_LENGTH(description_localized) > 0")
-        sample = Sample(rows, os.getenv('OPEN_AI_EMBEDDING_MODEL'), int(os.getenv('OPEN_AI_EMBEDDING_MAX_TOKENS')))
+        sample = Sample(rows)
     elif args.file:
-        sample = Sample(args.file, os.getenv('OPEN_AI_EMBEDDING_MODEL'), int(os.getenv('OPEN_AI_EMBEDDING_MAX_TOKENS')))
+        sample = Sample(args.file)
     else:
         raise Exception("Please specify either --samples or --file to fetch samples.")
 
-    pprint(sample._patents[0].unique_id)
+    conv = Converter(
+        sample,
+        os.getenv('OPEN_AI_EMBEDDING_MODEL'),
+        os.getenv('OPEN_AI_EMBEDDING_MAX_TOKENS'),
+        int(os.getenv('SUB_SAMPLE_SIZE')),
+        os.getenv('BASE_KEYS').split(','),
+        fully_minimize_json,
+        )
+    conv.get_embeddings()
+    # pprint(conv._stats)
 
 if __name__ == '__main__':
     main()

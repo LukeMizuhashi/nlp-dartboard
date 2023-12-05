@@ -20,7 +20,7 @@ class OpenAiClient:
         Args:
             text (str): The text string for which the embedding is to be generated.
         """
-        patent_str = json.dumps(patent.row)
+        patent_str = json.dumps(patent._row)
         enc = tiktoken.encoding_for_model(self.embedding_model)
         tokens = enc.encode(patent_str)
         print(len(tokens), self.max_tokens, len(tokens) > self.max_tokens)
