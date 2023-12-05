@@ -1,5 +1,5 @@
 import tiktoken
-from sample import Sample
+from sample import Sample, Patent
 import json
 from utils import pick_unique_random_numbers, fully_minimize_json, get_subset
 from collections import defaultdict
@@ -23,7 +23,8 @@ class Converter:
   def get_embeddings(self):
     for i, tokenized_patent in enumerate(self._subsample):
       base_patent = get_subset(tokenized_patent, [key for key in self._base_keys if self._token_counts[key][i] > 0])
-      pprint(base_patent)
+      non_base_patent = get_subset(tokenized_patent, [key for key in self._non_base_keys if self._token_counts[key][i] > 0])
+      pprint(non_base_patent)
 
   @property
   def _subsample(self) -> dict:
@@ -32,7 +33,10 @@ class Converter:
       for i in pick_unique_random_numbers(self._sample._patents, self._sample_size):
         minimized_patent = {}
         for key, value in self._sample._patents[i]._row.items():
-          minimized_patent[key] = self._minimization_strategy(json.dumps(value))
+          if key in Patent.special_keys: 
+            minimized_patent[key] = self._minimization_strategy(json.dumps(getattr(self._sample._patents[i], key)))
+          else:
+            minimized_patent[key] = self._minimization_strategy(json.dumps(value))
         self._subsample_memo.append(minimized_patent)
     return self._subsample_memo
 

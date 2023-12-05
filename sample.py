@@ -1,12 +1,33 @@
 import json
 import os
-from google.cloud.bigquery.table import RowIterator 
+from google.cloud.bigquery.table import RowIterator, Row 
 import uuid
-from utils import get_subset
+from typing import List
 
 class Patent:
+    special_keys = [
+        'cpc',
+        'uspc',
+        'citation',
+    ]
+
     def __init__(self, row):
-        self._row = row
+        self._row: Row = row
+    
+    def _get_code(self, key: str) -> List[str]:
+        return [obj.get('code') for obj in self._row.get(key)]
+
+    @property
+    def cpc(self) -> List[str]:
+        return self._get_code('cpc')
+    
+    @property
+    def uspc(self) -> List[str]:
+        return self._get_code('uspc')
+
+    @property
+    def citation(self) -> List[str]:
+        return [list(obj.values()) for obj in self._row.get('citation')]
 
     @property
     def unique_id(self) -> str:
