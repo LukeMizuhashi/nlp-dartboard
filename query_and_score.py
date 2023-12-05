@@ -3,10 +3,8 @@ from dotenv import load_dotenv
 import os
 import json
 from openai import OpenAI
-from utils import partition_string, pick_unique_random_numbers, fully_minimize_json
+from utils import partition_string
 from typing import List
-from pprint import pprint
-import tiktoken
 
 def main():
   load_dotenv(dotenv_path='.env.secrets')
@@ -27,7 +25,6 @@ def main():
     model = json.load(file)
 
   client = OpenAI()
-  # enc = tiktoken.encoding_for_model(os.getenv('OPEN_AI_EMBEDDING_MODEL'))
   query_embeddings = {}
   count = 0
   for query_sample in [sample for sample in samples if sample.get(primary_key) not in model.keys()]:
