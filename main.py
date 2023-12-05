@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import os
 from google_bigquery_patents_dataset import BigQueryTableReader
 from sample import Sample
-import pprint
+from pprint import pprint
 from utils import validate_n
 from open_ai_client import OpenAiClient
 import json
@@ -15,7 +15,6 @@ def main():
     parser = argparse.ArgumentParser(description='Fetch samples from BigQuery or JSON file.')
     parser.add_argument('--samples', type=int, help='Number of samples to fetch from BigQuery')
     parser.add_argument('--file', type=str, help='Path to a JSON file containing samples')
-    parser.add_argument('--print', action='store_true', help='Print the sample to stdout')
     args = parser.parse_args()
     
     if args.samples and args.file:
@@ -30,12 +29,7 @@ def main():
     else:
         raise Exception("Please specify either --samples or --file to fetch samples.")
 
-    if args.print:
-      for patent in sample.patents:
-        pprint.pprint(dict(patent.row))
-
-    # openAiClient = OpenAiClient(os.getenv('OPEN_AI_EMBEDDING_MODEL'), int(os.getenv('OPEN_AI_EMBEDDING_MAX_TOKENS')))
-    print(sample.get_average_base_token_overhead(as_percent_of_max=True))
+    pprint(sample._patents[0].unique_id)
 
 if __name__ == '__main__':
     main()
