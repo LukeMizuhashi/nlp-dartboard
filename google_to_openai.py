@@ -52,8 +52,8 @@ class Converter:
     minimized_patent = self._subsample[i]
     return get_subset(minimized_patent, [key for key in self._non_base_keys if self._token_counts[key][i] > 0])
 
-  def prepare_for_embedding(self) -> List[str]:
-    prepared_patents = []
+  def prepare_for_embedding(self) -> dict:
+    prepared_patents = {}
     for i in range(len(self._subsample)):
       base_patent = self._get_base_patent(i) 
       available_tokens = self._max_token - self._get_token_count(base_patent)
@@ -65,7 +65,7 @@ class Converter:
         if key in non_base_patent:
           merged_patent = {**base_patent, **non_base_patent}
           if self._get_token_count(merged_patent) <= self._max_token:
-            prepared_patents.append(self._minimization_strategy(json.dumps(merged_patent)))
+            prepared_patents[self._sample._patents[i].unique_id] = self._minimization_strategy(json.dumps(merged_patent))
           else:
             print(f"{self._sample._patents[i].unique_id} skipped: too many tokens after merge")
             continue

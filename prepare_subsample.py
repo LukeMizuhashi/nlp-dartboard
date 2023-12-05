@@ -4,9 +4,7 @@ import os
 import json
 from google_bigquery_patents_dataset import BigQueryTableReader
 from sample import Sample
-from pprint import pprint
-from utils import validate_n, fully_minimize_json
-from open_ai_client import OpenAiClient
+from utils import fully_minimize_json
 from google_to_openai import Converter 
 
 def main():
@@ -41,8 +39,8 @@ def main():
     fully_minimize_json,
     )
   prepared_subsample = conv.prepare_for_embedding()
-  print(f"Prepared {len(prepared_subsample)} subsamples from {os.getenv('SUB_SAMPLE_SIZE')} requested")
-  file_path = f"subsamples/len_{len(prepared_subsample)}_sample_{os.getenv('RUN_ID')}.json"
+  print(f"Prepared {len(prepared_subsample.keys())} subsamples from {os.getenv('SUB_SAMPLE_SIZE')} requested")
+  file_path = f"subsamples/len_{len(prepared_subsample.keys())}_sample_{os.getenv('RUN_ID')}.json"
   with open(file_path, 'w') as file:
     json.dump(prepared_subsample, file)
 
