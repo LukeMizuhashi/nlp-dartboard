@@ -43,3 +43,28 @@ def strip_json_structure(json_string: str) -> str:
 def fully_minimize_json(json_string: str) -> str:
     """Removes structural JSON characters from the given string and replaces any run of whitespace with a single space"""
     return replace_whitespace(strip_json_structure(json_string))
+
+def partition_string(s: str, overlap: int, chunk_size: int):
+    # Initialize the start index and the list to hold the index pairs
+    start_index = 0
+    index_pairs = []
+
+    # Loop through the string
+    while start_index < len(s):
+        # Calculate the end index
+        end_index = start_index + chunk_size
+
+        # Ensure the end index does not exceed the string length
+        end_index = min(end_index, len(s))
+
+        # Append the current start and end index pair to the list
+        index_pairs.append([start_index, end_index])
+
+        # Update the start index for the next iteration
+        start_index += chunk_size - overlap
+
+        # Handle the case where the overlap is larger than or equal to the chunk size
+        if overlap >= chunk_size and start_index < len(s):
+            start_index = len(s) - chunk_size
+
+    return index_pairs

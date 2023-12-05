@@ -10,7 +10,7 @@ def main():
   load_dotenv(dotenv_path='.env.openai.embedding.nonsecrets', override=True)
 
   parser = argparse.ArgumentParser(description='Fetch samples from BigQuery or JSON file.')
-  parser.add_argument('--input', required=True, type=str, help='Path to a JSON file containing samples')
+  parser.add_argument('--input', required=True, type=str, help='Path to a JSON file containing subsamples')
   args = parser.parse_args()
 
   with open(args.input, 'r') as file:
