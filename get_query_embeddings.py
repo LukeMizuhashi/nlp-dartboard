@@ -10,7 +10,7 @@ def main():
   load_dotenv(dotenv_path='.env.secrets')
   load_dotenv(dotenv_path='.env.get_query_embeddings.nonsecrets', override=True)
 
-  parser = argparse.ArgumentParser(description='Query model and score response.')
+  parser = argparse.ArgumentParser(description='Gets query embeddings.')
   parser.add_argument('--samples', required=True, type=str, help='Path to a JSON file containing samples')
   parser.add_argument('--embeddings', required=True, type=str, help='Path to a JSON file containing embeddings of some subset of the given samples')
   args = parser.parse_args()
