@@ -8,7 +8,7 @@ from typing import List
 
 def main():
   load_dotenv(dotenv_path='.env.secrets')
-  load_dotenv(dotenv_path='.env.step.3.nonsecrets', override=True)
+  load_dotenv(dotenv_path='.env.get_query_embeddings.nonsecrets', override=True)
 
   parser = argparse.ArgumentParser(description='Query model and score response.')
   parser.add_argument('--samples', required=True, type=str, help='Path to a JSON file containing samples')
