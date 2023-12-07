@@ -24,7 +24,27 @@ class Patent:
     @property
     def uspc(self) -> List[str]:
         return self._get_code('uspc')
+    
+    @property
+    def ipc(self) -> List[str]:
+        return self._get_code('ipc')
+    
+    @property
+    def fi(self) -> List[str]:
+        return self._get_code('fi')
+    
+    @property
+    def fterm(self) -> List[str]:
+        return self._get_code('fterm')
+    
+    @property
+    def locarno(self) -> List[str]:
+        return self._get_code('locarno')
 
+    @property
+    def all_codes(self) -> List[str]:
+        return self.cpc + self.uspc + self.ipc + self.fi + self.fterm + self.locarno
+    
     @property
     def citation(self) -> List[str]:
         return [list(obj.values()) for obj in self._row.get('citation')]
